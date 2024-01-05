@@ -13,9 +13,12 @@
 
       const result = await response.json();
 
-      document.getElementById('followingNotFollowersBack').innerHTML = `
-        <p>People you follow, but they don't follow you back: ${result.B_only.join(',</br> ')}</p>
-      `;
+      const instagramLinks = result.B_only.map(username => `<a href="https://www.instagram.com/${username}" target="_blank">${username}</a>`);
+
+document.getElementById('followingNotFollowersBack').innerHTML = `
+  <p>${instagramLinks.join(',<br>')}</p>
+`;
+
 
       document.getElementById('results').style.display = 'block';
     }
