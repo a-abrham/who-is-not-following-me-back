@@ -28,14 +28,12 @@ app.post('/compare-followers', upload.fields([
     const followersList = JSON.parse(followersBuffer).map(item => item.string_list_data[0].value);
     const followingList = JSON.parse(followingBuffer).relationships_following.map(item => item.string_list_data[0].value);
     
-    // Extract close friends' usernames
     const closeFriendsList = JSON.parse(closeFriendsBuffer).relationships_close_friends.map(item => item.string_list_data[0].value);
 
     const followersSet = new Set(followersList);
     const followingSet = new Set(followingList);
     const closeFriendsSet = new Set(closeFriendsList);
 
-    // Exclude close friends from followers and following sets
     const followersSetWithoutCloseFriends = new Set([...followersSet].filter(item => !closeFriendsSet.has(item)));
     const followingSetWithoutCloseFriends = new Set([...followingSet].filter(item => !closeFriendsSet.has(item)));
 
