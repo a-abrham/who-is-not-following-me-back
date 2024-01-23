@@ -6,7 +6,7 @@ const cors = require('cors'); // Add this line
 const _ = require('lodash');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 app.use(cors());
 
 
