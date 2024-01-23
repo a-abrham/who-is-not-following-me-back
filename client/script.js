@@ -6,7 +6,7 @@
       formData.append('followersFile', followersFile);
       formData.append('followingFile', followingFile);
 
-      const response = await fetch('http://localhost:3000/compare-followers', {
+      const response = await fetch('https://who-is-not-following-me-back-production.up.railway.app/compare-followers', {
         method: 'POST',
         body: formData,
       });
