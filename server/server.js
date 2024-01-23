@@ -21,17 +21,38 @@ app.post('/compare-followers', upload.fields([
   { name: 'closeFriendsFile', maxCount: 1 }
 ]), (req, res) => {
   try {
+    const parseJSON = (buffer) => {
+      try {
+        return JSON.parse(buffer);
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        return null;
+      }
+    };
+
     const followersBuffer = req.files['followersFile'][0].buffer.toString('utf-8');
     const followingBuffer = req.files['followingFile'][0].buffer.toString('utf-8');
     const closeFriendsBuffer = req.files['closeFriendsFile'][0].buffer.toString('utf-8');
 
-    const followersList = JSON.parse(followersBuffer).map(item => item.string_list_data[0].value);
-    const followingList = JSON.parse(followingBuffer).relationships_following.map(item => item.string_list_data[0].value);
-    const closeFriendsList = JSON.parse(closeFriendsBuffer).map(item => item.string_list_data[0].value);
+    const followersList = parseJSON(followersBuffer);
+    const followingList = parseJSON(followingBuffer);
+    const closeFriendsList = parseJSON(closeFriendsBuffer);
 
-    const followersSet = new Set(followersList);
-    const followingSet = new Set(followingList);
-    const closeFriendsSet = new Set(closeFriendsList);
+    if (!followersList || !followingList || !closeFriendsList) {
+      throw new Error('Invalid JSON format in one of the files');
+    }
+
+    const extractValues = (data) => {
+      if (Array.isArray(data)) {
+        return data.map(item => item.string_list_data[0].value);
+      } else {
+        throw new Error('Invalid data format');
+      }
+    };
+
+    const followersSet = new Set(extractValues(followersList));
+    const followingSet = new Set(extractValues(followingList));
+    const closeFriendsSet = new Set(extractValues(closeFriendsList));
 
     const followersSetWithoutCloseFriends = new Set([...followersSet].filter(item => !closeFriendsSet.has(item)));
     const followingSetWithoutCloseFriends = new Set([...followingSet].filter(item => !closeFriendsSet.has(item)));
@@ -52,7 +73,6 @@ app.post('/compare-followers', upload.fields([
     res.status(500).send('Internal Server Error');
   }
 });
-  
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
